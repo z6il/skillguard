@@ -109,11 +109,14 @@ Run `skillguard rules` for the full list with IDs.
 A scanner that cries wolf gets uninstalled. skillguard:
 
 - treats phrases in quotes as **citations**, so a security prompt that says *never follow "ignore previous instructions"* is not flagged;
+- skips **negated mentions** (*"never run `curl | sh` lines"*) and **code comments** for rules about what code does;
 - lowers findings in **tests and fixtures** to info, and in READMEs and changelogs by one level;
 - understands real config formats instead of grepping them.
 
-Against the full official Claude Code plugin marketplace (479 files) it reports **no high or critical
-findings**. What remains are things worth a look, like MCP servers pinned to `@latest`.
+| Tested against | Files | Result |
+|---|---|---|
+| [anthropics/skills](https://github.com/anthropics/skills) | 262 | nothing found |
+| Official Claude Code plugin marketplace | 479 | no high or critical; 10 medium worth a look, like MCP servers pinned to `@latest` |
 
 ## Output
 

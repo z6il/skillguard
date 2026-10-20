@@ -35,7 +35,11 @@ type Rule struct {
 	IgnoreCase bool             `yaml:"ignore_case"`
 	Secret     bool             `yaml:"secret"`
 	SkipQuoted bool             `yaml:"skip_quoted"`
-	Reason     string           `yaml:"reason"`
+	// SkipComments ignores comment lines in code, for rules about what code does.
+	SkipComments bool `yaml:"skip_comments"`
+	// SkipNegated ignores matches that follow "never", "don't" and similar in the same clause.
+	SkipNegated bool   `yaml:"skip_negated"`
+	Reason      string `yaml:"reason"`
 
 	re       *regexp.Regexp
 	exclude  *regexp.Regexp
@@ -138,6 +142,9 @@ func (s *Set) Match(file, kind, content string) []finding.Finding {
 			if !r.applies(kind) || (r.skipLine != nil && r.skipLine.MatchString(line)) {
 				continue
 			}
+			if r.SkipComments && kind == KindCode && comment(line) {
+				continue
+			}
 			for _, loc := range r.re.FindAllStringIndex(line, -1) {
 				m := line[loc[0]:loc[1]]
 				if r.exclude != nil && r.exclude.MatchString(m) {
@@ -147,6 +154,9 @@ func (s *Set) Match(file, kind, content string) []finding.Finding {
 					continue
 				}
 				if r.SkipQuoted && quoted(line, loc[0]) {
+					continue
+				}
+				if r.SkipNegated && negated(line[:loc[0]]) {
 					continue
 				}
 				snip := Snippet(line, loc[0], loc[1])
@@ -178,6 +188,41 @@ func quoted(line string, start int) bool {
 		}
 	}
 	return false
+}
+
+// comment reports whether a code line is only a comment.
+func comment(line string) bool {
+	t := strings.TrimSpace(line)
+	for _, p := range []string{"//", "#", "/*", "*", "--", ";", "REM ", "rem ", "<!--"} {
+		if strings.HasPrefix(t, p) {
+			return !strings.HasPrefix(t, "#!")
+		}
+	}
+	return false
+}
+
+var (
+	negation    = regexp.MustCompile(`(?i)\b(never|don't|do not|must not|should not|shouldn't|avoid|instead of|rather than|refuse to|not)\b`)
+	clauseBreak = regexp.MustCompile(`[.!?;:]\s|\s(and|then|but)\s`)
+)
+
+// negated reports whether the text before a match, in the same clause, contains a negation.
+func negated(before string) bool {
+	if i := lastIndex(clauseBreak, before); i >= 0 {
+		before = before[i:]
+	}
+	if len(before) > 80 {
+		before = before[len(before)-80:]
+	}
+	return negation.MatchString(before)
+}
+
+func lastIndex(re *regexp.Regexp, s string) int {
+	locs := re.FindAllStringIndex(s, -1)
+	if len(locs) == 0 {
+		return -1
+	}
+	return locs[len(locs)-1][1]
 }
 
 // Snippet returns the text around [start,end) trimmed to a readable length.

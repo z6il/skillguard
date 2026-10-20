@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: z6il/skillguard@v0.1.0
+      - uses: z6il/skillguard@v0.1.1
         with:
           path: .
           fail-on: high

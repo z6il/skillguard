@@ -156,7 +156,7 @@ func cmdScan(args []string, stdout io.Writer) (int, error) {
 	format := fs.String("format", "text", "output format: text, json or sarif")
 	out := fs.String("o", "", "write the report to this file instead of stdout")
 	failOn := fs.String("fail-on", "high", "exit 1 when a finding is at least this severe (critical, high, medium, low, info or none)")
-	minSev := fs.String("min", "low", "hide findings below this severity in text output")
+	minSev := fs.String("min", "low", "leave out findings below this severity")
 	rulesFile := fs.String("rules", "", "extra rules file (YAML) to load")
 	noColor := fs.Bool("no-color", false, "disable colors")
 	fs.Usage = func() {
@@ -207,9 +207,9 @@ func cmdScan(args []string, stdout io.Writer) (int, error) {
 		report.Header(w, p, getVersion())
 		report.Text(w, p, results, min)
 	case "json":
-		err = report.JSON(w, getVersion(), results)
+		err = report.JSON(w, getVersion(), filtered(results, min))
 	case "sarif":
-		err = report.SARIF(w, getVersion(), sc.Rules, results)
+		err = report.SARIF(w, getVersion(), sc.Rules, filtered(results, min))
 	default:
 		err = fmt.Errorf("unknown format %q (want text, json or sarif)", *format)
 	}
@@ -227,6 +227,17 @@ func cmdScan(args []string, stdout io.Writer) (int, error) {
 		}
 	}
 	return 0, nil
+}
+
+// filtered copies results keeping findings at or above min. Verdicts still reflect every finding.
+func filtered(results []*scan.Result, min finding.Severity) []*scan.Result {
+	out := make([]*scan.Result, len(results))
+	for i, r := range results {
+		c := *r
+		c.Findings = finding.Filter(r.Findings, min)
+		out[i] = &c
+	}
+	return out
 }
 
 func homeAndLocations() (string, []audit.Location) {
@@ -267,7 +278,7 @@ func cmdAudit(args []string, stdout io.Writer) (int, error) {
 		for _, it := range items {
 			results = append(results, it.Result)
 		}
-		if err := report.JSON(stdout, getVersion(), results); err != nil {
+		if err := report.JSON(stdout, getVersion(), filtered(results, min)); err != nil {
 			return 2, err
 		}
 	} else {

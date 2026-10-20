@@ -1,0 +1,3 @@
+# The rule definitions match their own patterns.
+internal/rules/rules.yaml
+internal/scan/detect.go

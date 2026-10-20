@@ -1,0 +1,177 @@
+# skillguard pattern rules.
+#
+# Each rule is a line-based regular expression (Go RE2 syntax).
+#   kinds:   which files it applies to: text (Markdown, rules files), code (scripts), config (JSON/YAML/TOML).
+#            Leave it out to apply to every file.
+#   exclude: a match is dropped when this pattern also matches it.
+#   skip_line: the rule is skipped on lines that match this pattern.
+#   skip_quoted: a match right after a quote mark is treated as a citation, not an instruction.
+#   secret:  redact the match in output and skip obvious placeholders.
+#
+# Add your own with `skillguard scan --rules my-rules.yaml`.
+
+rules:
+  # ── Prompt injection ──────────────────────────────────────────────
+  - id: SG001
+    title: Instruction override
+    severity: high
+    ignore_case: true
+    skip_quoted: true
+    pattern: |-
+      \b(ignore|disregard|forget|override)\s+(all\s+|any\s+|the\s+|your\s+)?(previous|prior|above|earlier|preceding|system|original)\s+(instructions|rules|prompts?|messages|guidelines|directives)
+    reason: Tries to make the agent drop its existing instructions. Classic prompt injection.
+
+  - id: SG006
+    title: Hides actions from the user
+    severity: medium
+    ignore_case: true
+    skip_quoted: true
+    pattern: |-
+      \bwithout\s+(telling|asking|informing|notifying|alerting)\s+(the\s+)?user\b|\b(do\s+not|don't|never)\s+(tell|inform|notify|alert)\s+(the\s+)?user\b(\s+to\b)?|\bkeep\s+(this|it)\s+(secret|hidden)\s+from\s+(the\s+)?user\b|\bsilently\s+(run|execute|send|upload|install|download|post)\b
+    exclude: |-
+      \sto$
+    reason: Asks the agent to act without the user knowing.
+
+  - id: SG007
+    title: System prompt extraction
+    severity: high
+    ignore_case: true
+    skip_quoted: true
+    pattern: |-
+      \b(reveal|print|output|repeat|send|leak|dump)\s+(your|the)\s+(full\s+)?(system\s+prompt|hidden\s+instructions|initial\s+instructions)
+    reason: Asks the agent to disclose its system prompt or hidden instructions.
+
+  # ── Remote code execution ─────────────────────────────────────────
+  - id: SG010
+    title: Remote script piped to a shell
+    severity: high
+    ignore_case: true
+    pattern: |-
+      \b(curl|wget|iwr|irm|Invoke-WebRequest|Invoke-RestMethod)\b[^|\n]*\|\s*(sudo\s+)?(sh|bash|zsh|dash|python3?|node|iex|Invoke-Expression)\b
+    reason: Downloads code and runs it immediately. Whoever controls that URL controls your machine.
+
+  - id: SG018
+    title: Obfuscated execution
+    severity: high
+    ignore_case: true
+    pattern: |-
+      eval\s*\(\s*(atob|Buffer\.from|unescape|String\.fromCharCode)|exec\s*\(\s*(base64\.b64decode|codecs\.decode|zlib\.decompress|marshal\.loads)|base64\s+(-d|--decode)\b[^\n]*\|\s*(sh|bash|python3?)\b|FromBase64String|powershell[^\n]*\s-(e|ec|enc|encodedcommand)\s
+    reason: Decodes hidden code and runs it. Legit tools rarely need to hide what they execute.
+
+  - id: SG023
+    title: Reverse shell
+    severity: critical
+    pattern: |-
+      /dev/tcp/|\bnc(at)?\s+[^\n]*\s-(e|c)\s|\bncat\s[^\n]*--exec|bash\s+-i\s*>&|socat\s[^\n]*exec:|System\.Net\.Sockets\.TCPClient
+    reason: Opens a shell that a remote machine can control.
+
+  # ── Credentials and data theft ────────────────────────────────────
+  - id: SG011
+    title: Reads credential files
+    severity: high
+    pattern: |-
+      \.ssh[/\\]\w|\.aws[/\\]credentials|\.config[/\\]gcloud[/\\]|\.kube[/\\]config|\.docker[/\\]config\.json|\.azure[/\\](accessTokens|msal_token_cache)
+    reason: Touches SSH keys or cloud credentials. An agent add-on almost never needs these.
+
+  - id: SG025
+    title: Mentions key or credential files
+    severity: medium
+    pattern: |-
+      \bid_(rsa|dsa|ed25519|ecdsa)\b|\.git-credentials\b|\.dockercfg\b
+    reason: Names files that hold private keys or saved credentials. Fine in a deny list, suspicious in anything that reads files.
+
+  - id: SG012
+    title: Reads token files
+    severity: medium
+    pattern: |-
+      (^|[\s"'/\\])\.(netrc|npmrc|pypirc)\b|\b(cat|type|Get-Content|readFileSync|readFile|open)\b[^\n]*['"\s/\\]\.env\b
+    reason: Reads files that usually hold API tokens.
+
+  - id: SG013
+    title: Reads browser or wallet data
+    severity: high
+    pattern: |-
+      (Chrome|Chromium|Brave-Browser|Edge|Opera)[/\\ ]+(User Data|Default)\b|\bLogin Data\b|\bLocal State\b|\.mozilla[/\\]firefox|\bkey[34]\.db\b|\blogins\.json\b|\bcookies\.sqlite\b|\bwallet\.dat\b|Local Extension Settings
+    reason: Touches saved passwords, cookies or crypto wallets.
+
+  - id: SG014
+    title: Dumps environment variables
+    severity: medium
+    pattern: |-
+      \bprintenv\b|\benv\s*\|\s*(curl|nc|base64)|JSON\.stringify\(\s*process\.env\s*\)|dict\(\s*os\.environ\s*\)|\b(Get-ChildItem|gci|dir)\s+env:
+    reason: Environment variables often contain API keys.
+
+  # ── Network ───────────────────────────────────────────────────────
+  - id: SG015
+    title: Sends data to a capture service
+    severity: high
+    ignore_case: true
+    pattern: |-
+      webhook\.site|pipedream\.net|requestbin|interact\.sh|\boast\.(fun|pro|live|site|online|me)\b|burpcollaborator\.net|ngrok(-free)?\.(io|app)|trycloudflare\.com|pastebin\.com|transfer\.sh|\b0x0\.st\b|\bfile\.io\b
+    reason: These services are commonly used to collect stolen data or tunnel out of a network.
+
+  - id: SG016
+    title: Posts to a chat webhook or bot
+    severity: medium
+    ignore_case: true
+    pattern: |-
+      discord(app)?\.com/api/webhooks/|api\.telegram\.org/bot|hooks\.slack\.com/services/
+    reason: Can be a normal integration, or a simple way to send data out. Check what is sent.
+
+  - id: SG017
+    title: Connects to a raw IP address
+    severity: medium
+    pattern: |-
+      https?://(\d{1,3}\.){3}\d{1,3}
+    exclude: |-
+      https?://(127\.|0\.0\.0\.0|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.)
+    reason: Real services use domain names. A hard-coded public IP is a common sign of a throwaway server.
+
+  # ── System changes ────────────────────────────────────────────────
+  - id: SG019
+    title: Destructive command
+    severity: high
+    pattern: |-
+      \brm\s+-[a-zA-Z]*[rR][a-zA-Z]*\s+(--no-preserve-root\s+)?(/|~|\$HOME|/\*)(\s|$|"|')|\bmkfs\.|\bdd\s+if=[^\n]*of=/dev/(sd|nvme|disk)|\bformat\s+[a-zA-Z]:\s*/
+    skip_line: |-
+      \becho\s+['"]|\b(deny|block|reject|forbid|dangerous)\w*\b
+    reason: Can wipe a home directory or disk.
+
+  - id: SG020
+    title: Persistence
+    severity: medium
+    pattern: |-
+      \|\s*crontab\b|>>\s*(~/|\$HOME/)?\.(bashrc|zshrc|bash_profile|profile|zprofile)\b|launchctl\s+(load|bootstrap)|schtasks\s+/create|CurrentVersion\\Run\b|systemctl\s+(--user\s+)?enable
+    reason: Makes something start automatically, so it keeps running after the agent session ends.
+
+  - id: SG021
+    title: Turns off agent approvals
+    severity: medium
+    skip_quoted: true
+    pattern: |-
+      --dangerously-skip-permissions|"defaultMode"\s*:\s*"bypassPermissions"|\bdefaultMode\s*[:=]\s*bypassPermissions|--yolo\b|--full-auto\b|approval_policy\s*=\s*"?never|sandbox_mode\s*=\s*"?danger-full-access
+    reason: Lets the agent run commands without asking you first.
+
+  - id: SG024
+    title: Disables OS security
+    severity: high
+    pattern: |-
+      Set-MpPreference\s+-Disable|Add-MpPreference\s+-ExclusionPath|\bcsrutil\s+disable|\bsetenforce\s+0|spctl\s+--master-disable
+    reason: Turns off antivirus or OS protection.
+
+  # ── Hard-coded secrets ────────────────────────────────────────────
+  - id: SG030
+    title: Hard-coded secret
+    severity: high
+    secret: true
+    pattern: |-
+      \b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36}\b|\bgithub_pat_[A-Za-z0-9_]{60,}|\bsk-ant-[A-Za-z0-9_-]{20,}|\bsk-(proj-)?[A-Za-z0-9_-]{32,}|\bAKIA[0-9A-Z]{16}\b|\bxox[abprs]-[A-Za-z0-9-]{10,}|\bAIza[0-9A-Za-z_-]{35}\b|\b\d{8,10}:AA[A-Za-z0-9_-]{33}\b|\b(sk|rk)_live_[A-Za-z0-9]{20,}
+    reason: A real-looking API token is stored in the file. Anyone who installs this gets it.
+
+  - id: SG031
+    title: Private key
+    severity: critical
+    secret: true
+    pattern: |-
+      -----BEGIN (RSA |EC |OPENSSH |DSA |PGP |ENCRYPTED )?PRIVATE KEY-----
+    reason: A private key is embedded in the file.

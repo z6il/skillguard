@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="280" viewBox="0 0 1200 280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0b12"/>
+      <stop offset="1" stop-color="#170a10"/>
+    </linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0V28" fill="none" stroke="#ffffff" stroke-opacity="0.035"/>
+    </pattern>
+    <radialGradient id="glow" cx="0.82" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ff2e4d" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ff2e4d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="280" rx="16" fill="url(#bg)"/>
+  <rect width="1200" height="280" rx="16" fill="url(#grid)"/>
+  <rect width="1200" height="280" rx="16" fill="url(#glow)"/>
+
+  <!-- shield -->
+  <g transform="translate(905 52)">
+    <path d="M88 0 L176 32 V96 C176 150 138 186 88 204 C38 186 0 150 0 96 V32 Z" fill="none" stroke="#ff2e4d" stroke-width="5"/>
+    <path d="M88 22 L156 46 V96 C156 138 128 166 88 182 C48 166 20 138 20 96 V46 Z" fill="#ff2e4d" fill-opacity="0.08"/>
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#ff2e4d" fill-opacity="0.75">
+      <text x="44" y="84">SKILL.md</text>
+      <text x="44" y="108">hooks.json</text>
+      <text x="44" y="132">.mcp.json</text>
+    </g>
+    <path d="M58 150 l18 18 l38 -40" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <rect x="72" y="78" width="54" height="5" rx="2.5" fill="#ff2e4d"/>
+  <text x="70" y="148" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="64" font-weight="700" fill="#ffffff">skillguard</text>
+  <text x="72" y="192" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" font-size="24" fill="#b7b7c9">Know what your agent add-ons do before they run.</text>
+  <text x="72" y="232" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#6b6b80">skills · plugins · hooks · MCP servers  —  Claude Code · Cursor · Codex · Gemini CLI</text>
+</svg>

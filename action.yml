@@ -1,0 +1,56 @@
+name: skillguard
+description: Scan agent skills, plugins, hooks and MCP configs for hidden instructions, risky commands and unpinned packages.
+author: z6il
+branding:
+  icon: shield
+  color: red
+
+inputs:
+  path:
+    description: Folder to scan.
+    default: "."
+  fail-on:
+    description: Fail the job when a finding is at least this severe (critical, high, medium, low, info or none).
+    default: high
+  sarif:
+    description: Upload findings to GitHub code scanning. Needs `security-events: write`.
+    default: "true"
+  version:
+    description: skillguard version to install, e.g. v0.1.0.
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version: stable
+        cache: false
+
+    - name: Install skillguard
+      shell: bash
+      env:
+        SG_VERSION: ${{ inputs.version }}
+      run: go install "github.com/z6il/skillguard@${SG_VERSION}"
+
+    - name: Scan (SARIF)
+      if: inputs.sarif == 'true'
+      shell: bash
+      env:
+        SG_PATH: ${{ inputs.path }}
+      run: skillguard scan "$SG_PATH" --format sarif -o skillguard.sarif --fail-on none
+
+    - name: Upload to code scanning
+      if: inputs.sarif == 'true'
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: skillguard.sarif
+        category: skillguard
+
+    - name: Scan
+      shell: bash
+      env:
+        SG_PATH: ${{ inputs.path }}
+        SG_FAIL_ON: ${{ inputs.fail-on }}
+        FORCE_COLOR: "1"
+      run: skillguard scan "$SG_PATH" --fail-on "$SG_FAIL_ON"

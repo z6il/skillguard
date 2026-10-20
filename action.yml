@@ -13,7 +13,7 @@ inputs:
     description: Fail the job when a finding is at least this severe (critical, high, medium, low, info or none).
     default: high
   sarif:
-    description: Upload findings to GitHub code scanning. Needs `security-events: write`.
+    description: "Upload findings to GitHub code scanning. Needs the security-events: write permission."
     default: "true"
   version:
     description: skillguard version to install, e.g. v0.1.0.

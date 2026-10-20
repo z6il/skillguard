@@ -36,3 +36,17 @@ jobs:
         env:
           FORCE_COLOR: "1"
         run: go run . scan . --fail-on high
+
+  action:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run the published action
+        uses: ./
+        with:
+          path: .
+          fail-on: high

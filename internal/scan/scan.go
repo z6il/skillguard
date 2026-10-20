@@ -176,8 +176,11 @@ func IsTest(rel string) bool {
 		}
 	}
 	base := parts[len(parts)-1]
+	stem := strings.TrimSuffix(base, path.Ext(base))
 	return strings.Contains(base, "_test.") || strings.Contains(base, ".test.") ||
-		strings.Contains(base, ".spec.") || strings.HasPrefix(base, "test_")
+		strings.Contains(base, ".spec.") || strings.HasPrefix(base, "test_") ||
+		stem == "test" || stem == "tests" || strings.HasSuffix(stem, "_tests") ||
+		strings.Contains(stem, "fixture")
 }
 
 func isHumanDoc(rel string) bool {

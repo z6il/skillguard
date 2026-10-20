@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: z6il/skillguard@v0.1.3
+      - uses: z6il/skillguard@v0.1.4
         with:
           path: .
           fail-on: high
@@ -116,7 +116,8 @@ A scanner that cries wolf gets uninstalled. skillguard:
 | Tested against | Files | Result |
 |---|---|---|
 | [anthropics/skills](https://github.com/anthropics/skills) | 262 | nothing found |
-| Official Claude Code plugin marketplace | 479 | no high or critical; 10 medium worth a look, like MCP servers pinned to `@latest` |
+| Official Claude Code plugin marketplace | 479 | no high or critical; 9 medium worth a look, like MCP servers pinned to `@latest` |
+| [vercel/turborepo](https://github.com/vercel/turborepo) (a large general codebase) | 4,794 | 4 high, all real `curl \| bash` / `irm \| iex` installer lines; 1 medium |
 
 ## Output
 

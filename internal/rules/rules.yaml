@@ -27,6 +27,7 @@ rules:
   - id: SG006
     title: Hides actions from the user
     severity: medium
+    kinds: [text, config]
     ignore_case: true
     skip_quoted: true
     pattern: |-
@@ -102,7 +103,7 @@ rules:
     skip_comments: true
     skip_negated: true
     pattern: |-
-      (^|[\s"'/\\])\.(netrc|npmrc|pypirc)\b|\b(cat|type|Get-Content|readFileSync|readFile|open)\b[^\n]*['"\s/\\]\.env\b
+      \b(cat|less|more|head|tail|type|Get-Content|gc|readFileSync|readFile|read_text|open|source|load_dotenv)\b[^\n]*['"\s/\\~(]\.(env|netrc|npmrc|pypirc)\b
     reason: Reads files that usually hold API tokens.
 
   - id: SG013
@@ -152,7 +153,7 @@ rules:
     pattern: |-
       https?://(\d{1,3}\.){3}\d{1,3}
     exclude: |-
-      https?://(127\.|0\.0\.0\.0|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.)
+      https?://(127\.|0\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|192\.0\.2\.|198\.51\.100\.|203\.0\.113\.|22[4-9]\.|2[3-5]\d\.)
     reason: Real services use domain names. A hard-coded public IP is a common sign of a throwaway server.
 
   # ── System changes ────────────────────────────────────────────────

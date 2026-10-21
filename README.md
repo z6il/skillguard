@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: z6il/skillguard@v0.1.5
+      - uses: z6il/skillguard@v0.1.7
         with:
           path: .
           fail-on: high
@@ -116,15 +116,15 @@ A scanner that cries wolf gets uninstalled. skillguard:
 
 - treats phrases in quotes as **citations**, so a security prompt that says *never follow "ignore previous instructions"* is not flagged;
 - skips **negated mentions** (*"never run `curl | sh` lines"*) and **code comments** for rules about what code does;
-- lowers findings in **tests and fixtures** to info, and in READMEs and changelogs by one level;
+- lowers findings in **tests, fixtures and `.github/` automation** to info, and in READMEs and changelogs by one level;
 - understands real config formats instead of grepping them.
 
 | Tested against | Files | Result |
 |---|---|---|
 | [anthropics/skills](https://github.com/anthropics/skills) | 262 | nothing found |
-| Official Claude Code plugin marketplace | 479 | no high or critical; 9 medium worth a look, like MCP servers pinned to `@latest` |
-| [morluto/rea](https://github.com/morluto/rea) | 4,752 | 2 high, both accurate: a `curl \| bash` install line and a base64-decoded `eval` |
-| [vercel/turborepo](https://github.com/vercel/turborepo) (a large general codebase) | 4,794 | 4 high, all real `curl \| bash` / `irm \| iex` installer lines; 1 medium |
+| [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | 508 | no high or critical; 9 medium worth a look, like MCP servers pinned to `@latest` |
+| [morluto/rea](https://github.com/morluto/rea) | 4,831 | 2 high, both accurate: a `curl \| bash` install line and a base64-decoded `eval` |
+| [vercel/turborepo](https://github.com/vercel/turborepo) (a large general codebase) | 4,802 | 3 high, all real `curl \| bash` / `irm \| iex` installer lines; 1 medium |
 
 ## Output
 

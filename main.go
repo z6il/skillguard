@@ -466,7 +466,7 @@ func cmdLock(args []string, stdout io.Writer) (int, error) {
 			return 2, err
 		}
 		lf.Put(it.key, hashes)
-		fmt.Fprintf(stdout, " %s %s %s\n", p.Red("▸"), it.key, p.Dim(fmt.Sprintf("locked %d files", len(hashes))))
+		fmt.Fprintf(stdout, " %s %s %s\n", p.Red("▸"), it.key, p.Dim("locked "+plural(len(hashes), "file", "files")))
 	}
 	if err := lf.Save(path); err != nil {
 		return 2, err
@@ -620,24 +620,35 @@ func cmdDiff(args []string, stdout io.Writer) (int, error) {
 	return 1, nil
 }
 
+func plural(n int, one, many string) string {
+	if n == 1 {
+		return "1 " + one
+	}
+	return fmt.Sprintf("%d %s", n, many)
+}
+
 func cmdRules(stdout io.Writer) (int, error) {
 	set, err := rules.Default()
 	if err != nil {
 		return 2, err
 	}
 	type row struct {
-		id, sev, title string
+		id    string
+		sev   finding.Severity
+		title string
 	}
 	var rows []row
 	for _, r := range set.Rules {
-		rows = append(rows, row{r.ID, r.Severity.String(), r.Title})
+		rows = append(rows, row{r.ID, r.Severity, r.Title})
 	}
 	for _, m := range rules.Builtins {
-		rows = append(rows, row{m.ID, m.Severity.String(), m.Title})
+		rows = append(rows, row{m.ID, m.Severity, m.Title})
 	}
 	sort.Slice(rows, func(i, j int) bool { return rows[i].id < rows[j].id })
+	f, _ := stdout.(*os.File)
+	p := painter(f, false)
 	for _, r := range rows {
-		fmt.Fprintf(stdout, "%-6s %-9s %s\n", r.id, r.sev, r.title)
+		fmt.Fprintf(stdout, " %s %s  %s\n", p.Sev(r.sev), p.Dim(r.id), r.title)
 	}
 	return 0, nil
 }

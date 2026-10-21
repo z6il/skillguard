@@ -152,6 +152,11 @@ func adjust(rel string, fs []finding.Finding) []finding.Finding {
 			fs[i].Severity = finding.Info
 			fs[i].Reason = "Test or fixture file, which agents don't load. " + fs[i].Reason
 		}
+	case strings.HasPrefix(rel, ".github/"):
+		for i := range fs {
+			fs[i].Severity = finding.Info
+			fs[i].Reason = "Repository automation (CI, templates, review policy), which agents don't load. " + fs[i].Reason
+		}
 	case isHumanDoc(rel):
 		for i := range fs {
 			if fs[i].Severity > finding.Info {

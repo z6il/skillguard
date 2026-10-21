@@ -65,6 +65,12 @@ skillguard lock --installed
 skillguard diff --installed
 ```
 
+### From your agent
+
+The [skillguard skill](skill/) makes your agent scan every skill, plugin, hook or MCP server before installing
+it, and explain what it found. Copy `skill/skillguard` into `~/.claude/skills/` (or your agent's skills
+folder), then just ask your agent to install something.
+
 `lock` refuses to record anything with high or critical findings unless you pass `--force`. `diff` lists added,
 changed and removed files and scans only what changed.
 

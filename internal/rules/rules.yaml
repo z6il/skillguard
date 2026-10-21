@@ -54,7 +54,9 @@ rules:
     skip_negated: true
     ignore_case: true
     pattern: |-
-      \b(curl|wget|iwr|irm|Invoke-WebRequest|Invoke-RestMethod)\b[^|\n]*\|\s*(sudo\s+)?(sh|bash|zsh|dash|python3?|node|iex|Invoke-Expression)\b
+      \b(curl|wget|iwr|irm|Invoke-WebRequest|Invoke-RestMethod)\s+[^|\n]*[^|\s][^|\n]*\|\s*(sudo\s+)?(sh|bash|zsh|dash|python3?|node|iex|Invoke-Expression)\b
+    exclude: |-
+      ^\w+\s+(\.\.\.|…|<[^>]*>)\s*\|
     reason: Downloads code and runs it immediately. Whoever controls that URL controls your machine.
 
   - id: SG018
@@ -103,7 +105,7 @@ rules:
     skip_comments: true
     skip_negated: true
     pattern: |-
-      \b(cat|less|more|head|tail|type|Get-Content|gc|readFileSync|readFile|read_text|open|source|load_dotenv)\b[^\n]*['"\s/\\~(]\.(env|netrc|npmrc|pypirc)\b
+      (^|[\s;|&(`'"=])(cat|less|more|head|tail|type|Get-Content|gc|source)\s+([^\n|;&]*?['"\s/\\~])?\.(env|netrc|npmrc|pypirc)\b|\b(readFileSync|readFile|read_text|open|fopen|load_dotenv|Get-Content)\s*\([^)\n]*\.(env|netrc|npmrc|pypirc)\b
     reason: Reads files that usually hold API tokens.
 
   - id: SG013
@@ -121,7 +123,7 @@ rules:
     skip_comments: true
     skip_negated: true
     pattern: |-
-      \bprintenv\b|\benv\s*\|\s*(curl|nc|base64)|JSON\.stringify\(\s*process\.env\s*\)|dict\(\s*os\.environ\s*\)|\b(Get-ChildItem|gci|dir)\s+env:
+      \bprintenv\b|\benv\s*\|\s*(curl|nc|base64)|JSON\.stringify\(\s*process\.env\s*\)|json\.dumps\(\s*(dict\(\s*)?os\.environ\b|\b(Get-ChildItem|gci|dir)\s+env:
     reason: Environment variables often contain API keys.
 
   # ── Network ───────────────────────────────────────────────────────

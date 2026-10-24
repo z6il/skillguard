@@ -180,3 +180,5 @@ Please report security issues privately via [GitHub security advisories](https:/
 ## License
 
 MIT © 2026 [Abdullah Almuntaser](https://github.com/z6il)
+
+[![M8ven Score](https://m8ven.ai/badge/mcp/z6il-skillguard-18lj3s?v=f6e4c3c226d26c0ba4b5334db14aa998)](https://m8ven.ai/mcp/z6il-skillguard-18lj3s?s=readme)

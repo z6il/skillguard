@@ -8,6 +8,7 @@
   <img alt="Go" src="https://img.shields.io/badge/Go-single_binary-111?style=for-the-badge&logo=go&logoColor=00ADD8">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-111?style=for-the-badge">
 </p>
+[![M8ven Score](https://m8ven.ai/badge/mcp/z6il-skillguard-18lj3s?v=fa2961dec65b8bb972ff2200a1531237)](https://m8ven.ai/mcp/z6il-skillguard-18lj3s?s=readme)
 
 <p align="center">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude_Code-111?logo=anthropic&logoColor=white">
@@ -180,5 +181,3 @@ Please report security issues privately via [GitHub security advisories](https:/
 ## License
 
 MIT © 2026 [Abdullah Almuntaser](https://github.com/z6il)
-
-[![M8ven Score](https://m8ven.ai/badge/mcp/z6il-skillguard-18lj3s?v=f6e4c3c226d26c0ba4b5334db14aa998)](https://m8ven.ai/mcp/z6il-skillguard-18lj3s?s=readme)

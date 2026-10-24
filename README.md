@@ -7,6 +7,7 @@
   <a href="https://github.com/z6il/skillguard/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/z6il/skillguard?style=for-the-badge&color=ff2e4d"></a>
   <img alt="Go" src="https://img.shields.io/badge/Go-single_binary-111?style=for-the-badge&logo=go&logoColor=00ADD8">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-111?style=for-the-badge">
+  
 [![M8ven Score](https://m8ven.ai/badge/mcp/z6il-skillguard-18lj3s?v=fa2961dec65b8bb972ff2200a1531237)](https://m8ven.ai/mcp/z6il-skillguard-18lj3s?s=readme)
 
 <p align="center">

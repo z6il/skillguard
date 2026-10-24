@@ -7,9 +7,6 @@
   <a href="https://github.com/z6il/skillguard/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/z6il/skillguard?style=for-the-badge&color=ff2e4d"></a>
   <img alt="Go" src="https://img.shields.io/badge/Go-single_binary-111?style=for-the-badge&logo=go&logoColor=00ADD8">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-111?style=for-the-badge">
-  
-[![M8ven Score](https://m8ven.ai/badge/mcp/z6il-skillguard-18lj3s?v=fa2961dec65b8bb972ff2200a1531237)](https://m8ven.ai/mcp/z6il-skillguard-18lj3s?s=readme)
-
 <p align="center">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude_Code-111?logo=anthropic&logoColor=white">
   <img alt="Cursor" src="https://img.shields.io/badge/Cursor-111?logo=cursor&logoColor=white">
@@ -17,6 +14,8 @@
   <img alt="Gemini CLI" src="https://img.shields.io/badge/Gemini_CLI-111?logo=googlegemini&logoColor=white">
   <img alt="Offline" src="https://img.shields.io/badge/100%25_offline-111">
 </p>
+
+[![M8ven Score](https://m8ven.ai/badge/mcp/z6il/skillguard)](https://m8ven.ai/mcp/z6il/skillguard?s=readme?variant=verified)
 
 **skillguard** checks agent skills, plugins, hooks and MCP server configs before you trust them. It finds
 instructions hidden from you, commands that phone home, secrets in configs and packages that can change under
